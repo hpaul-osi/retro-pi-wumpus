@@ -2,6 +2,7 @@ import kbhit
 import os
 import sys
 import time
+import WumpusGameEngine
 
 ESC = chr(27)
 CR = chr(13)
@@ -66,7 +67,8 @@ def get_cmd():
 
 def game_screen():
     print("Hold down CTRL and press C to quit ...")
-    print("TODO: Something about Wumpus")
+
+    WumpusGameEngine.displayRoomInfo()
     while True:
         cmd = get_cmd()
         print()
@@ -74,6 +76,7 @@ def game_screen():
 
 def main():
     enable_ansi()
+    WumpusGameEngine.init()
 
     clear_screen()
     print("Welcome to PI Wumpus!")
@@ -85,6 +88,8 @@ def main():
 
     clear_screen()
 
+    WumpusGameEngine.banner()
+    WumpusGameEngine.start_game()
     game_screen()
 
 if __name__ == "__main__":

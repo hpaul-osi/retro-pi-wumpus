@@ -13,6 +13,10 @@ import time
 import datetime
 import signal
 
+# globals
+Cave = []
+moveCount = 0
+
 def show_instructions():
     print ("""
         WELCOME TO 'HUNT THE WUMPUS'
@@ -130,7 +134,6 @@ class Thing:
     def is_hit(self, a_room):
         return self.location == a_room
 
-
 def create_things(a_cave):
 
     Things = []
@@ -142,6 +145,8 @@ def create_things(a_cave):
 
 
 def create_cave():
+    global Cave
+
     # First create a list of all the rooms.
     for number in range(20):
         Cave.append(Room(number = number +1))
@@ -245,6 +250,8 @@ def executeMove(raw_command):
         pass   
 
 def displayRoomInfo():
+    global Player
+
     Player.location.describe()
     #Check each <Player.location.connects_to> for hazards.
     for room in Player.location.connects_to:
@@ -264,6 +271,8 @@ def getPollingResults(moveCount):
 def polling():
     while True:
         global moveCount
+        global Player
+
         time.sleep(1)
 
         #TODO call server API to get polling results
@@ -287,29 +296,35 @@ def polling():
             executeMove(result)
             moveCount += 1
             displayRoomInfo()
-            print("\n> ");
+            print("\n> ")
 
-# ============ BEGIN HERE ===========
-moveCount = 1
+# PIWumpus.py entry points
+def init():
+    global Arrows
+    global Wumpus
+    global Player
+    global Pit1
+    global Pit2
+    global Bats1
+    global Bats2
 
-#seed so that everyone has same random map
-random.seed(1000)
+    #seed so that everyone has same random map
+    random.seed(1000)
 
-#create therad for polling and game execution
-threading._start_new_thread(polling)
+    create_cave()
 
-Cave = []
-create_cave()
+    # Make player, wumpus, bats, pits and put into cave.
 
-# Make player, wumpus, bats, pits and put into cave.
+    Wumpus, Player, Pit1, Pit2, Bats1, Bats2 = create_things(Cave)
 
-Wumpus, Player, Pit1, Pit2, Bats1, Bats2 = create_things(Cave)
+    Arrows = 5
 
-Arrows = 5
+def start_game():
+    #create therad for polling and game execution
+    threading._start_new_thread(polling, ())
 
-# Now play the game
-
-print("""\n   Welcome to the cave, Great White Hunter.
+def banner():
+    print("""\n   Welcome to the cave, Great White Hunter.
     You are hunting the Wumpus.
     On any turn you can move or shoot.
     Commands are entered in the form of ACTION LOCATION
@@ -317,16 +332,3 @@ print("""\n   Welcome to the cave, Great White Hunter.
     type 'HELP' for instructions.
     'QUIT' to end the game.
     """)
-
-displayRoomInfo()
-
-while True:
-    # input here
-    command = input("\n> ")
-
-    #send command to server to post vote
-    sendVote(command, moveCount)
-        
-        
-         
-    
