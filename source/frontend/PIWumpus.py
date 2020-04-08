@@ -89,6 +89,7 @@ def main():
     clear_screen()
 
     WumpusGameEngine.banner()
+    WumpusGameEngine.start_game()
     game_screen()
 
 if __name__ == "__main__":
