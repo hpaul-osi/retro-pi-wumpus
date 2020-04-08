@@ -1,24 +1,25 @@
-import socket
+import aiohttp
+import asyncio
 
-def client_program():
-    host = "127.0.0.1" #socket.gethostname()  # as both code is running on same pc
-    port = 5000  # socket server port number
+async def fetch(session, url):
+    async with session.get(url) as response:
+        return await response.text()
 
-    client_socket = socket.socket()  # instantiate
-    client_socket.connect((host, port))  # connect to the server
+async def post(session, url, data):
+    async with session.post(url, json=data) as response:
+        return await response.text()
 
-    message = input(" -> ")  # take input
-
-    while message.lower().strip() != 'bye':
-        client_socket.send(message.encode())  # send message
-        data = client_socket.recv(1024).decode()  # receive response
-
-        print('Received from server: ' + data)  # show in terminal
-
-        message = input(" -> ")  # again take input
-
-    client_socket.close()  # close the connection
-
+async def main():
+    async with aiohttp.ClientSession() as session:
+        url = 'http://localhost:8080'
+        data = {'move': '1'} # this is JSON
+        # Check that we have connected to the server and have comms 
+        html = await fetch(session, url)
+        print(html)
+        # Send a post to the server with fake move data
+        html = await post(session, url, data)
+        print(html)
 
 if __name__ == '__main__':
-    client_program()
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
