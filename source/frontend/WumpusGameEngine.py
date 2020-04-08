@@ -311,9 +311,6 @@ def init():
     #seed so that everyone has same random map
     random.seed(1000)
 
-    #create therad for polling and game execution
-    threading._start_new_thread(polling, ())
-
     create_cave()
 
     # Make player, wumpus, bats, pits and put into cave.
@@ -321,6 +318,10 @@ def init():
     Wumpus, Player, Pit1, Pit2, Bats1, Bats2 = create_things(Cave)
 
     Arrows = 5
+
+def start_game():
+    #create therad for polling and game execution
+    threading._start_new_thread(polling, ())
 
 def banner():
     print("""\n   Welcome to the cave, Great White Hunter.
