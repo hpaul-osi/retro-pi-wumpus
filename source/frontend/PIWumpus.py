@@ -119,10 +119,12 @@ def add_chat(s):
         chat_line = CHAT_START
         erase_lines(CHAT_START, CHAT_END)
 
-def get_cmd():
+async def get_cmd(session):
     cmd = ""
 
     while True:
+        await idle(session)
+
         erase_line(INPUT_LINE)
         print_part("> {}".format(cmd))
 
@@ -132,6 +134,7 @@ def get_cmd():
             cmd = cmd.rstrip()
             done = True
             break
+
     return cmd
 
 async def idle(session):
@@ -147,11 +150,10 @@ async def game_screen(session):
 
     WumpusGameEngine.displayRoomInfo()
     while True:
-        cmd = get_cmd()
+        cmd = await get_cmd(session)
         print()
         
         await convert_cmd_to_request(cmd, session)
-        await idle(session)
 
 def isInteger(value):
     try:
