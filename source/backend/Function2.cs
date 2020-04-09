@@ -26,7 +26,7 @@ namespace VotePolling
 
             var sDSWumpusData = new SDSWumpusData();            
 
-            WumpusAction maxRepeatedItem;
+            string maxRepeatedItem;
             try
             {
                 var wumpusActionVotes = await sDSWumpusData.AggregateWumpusDataValue(moveNumber);
@@ -40,7 +40,7 @@ namespace VotePolling
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
             
-            return new OkObjectResult(maxRepeatedItem);
+            return new OkObjectResult(new Result { voteResult = maxRepeatedItem });
         }
     }
 }
