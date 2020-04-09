@@ -108,7 +108,8 @@ def get_cmd():
 
 def idle():
     add_chat("TODO: Print other users commands")
-    # poll server
+    # TODO poll server for chats
+    # TODO poll server for round results
 
 def game_screen():
     clear_screen()
