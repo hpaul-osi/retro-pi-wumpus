@@ -104,6 +104,7 @@ async def lobby_screen(session, login):
     status = await getIsGameStarted(session)
     if(status == 200):
         print("HELLO {}! A GAME IS IN PROGRESS, PLEASE TRY AGAIN LATER.".format(login))
+        game_over(session)
         sys.exit(0)
 
     print("HELLO {}! YOU ARE NOW IN THE LOBBY. OTHER NERVOUS ENGINEERS THAT ARE AVOIDING EYE CONTACT ARE:".format(login))
@@ -137,17 +138,19 @@ async def get_cmd(session):
     cmd = ""
 
     while True:
-        await idle(session)
+        move = await idle(session)
+        if (move != ""):
+            print(move)
+        else:
+            erase_line(INPUT_LINE)
+            print_part("> {}".format(cmd))
 
-        erase_line(INPUT_LINE)
-        print_part("> {}".format(cmd))
-
-        input = input_async(REFRESH_INTERVAL)
-        cmd += input
-        if len(cmd) > 0 and cmd[-1]==CR:
-            cmd = cmd.rstrip()
-            done = True
-            break
+            input = input_async(REFRESH_INTERVAL)
+            cmd += input
+            if len(cmd) > 0 and cmd[-1]==CR:
+                cmd = cmd.rstrip()
+                done = True
+                break
 
     return cmd
 
@@ -163,7 +166,7 @@ async def idle(session):
     for chat in chats:
         add_chat(chat)
 
-    await getTryGetResult(session)
+    return await getTryGetResult(session)
 
 async def game_over(session):
     await postStopGame(session)

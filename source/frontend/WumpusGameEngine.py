@@ -15,7 +15,7 @@ import signal
 
 # globals
 Cave = []
-moveCount = 0
+moveCount = 1
 GameOver = False
 
 def show_instructions():
