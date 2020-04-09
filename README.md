@@ -45,9 +45,11 @@ Repository for the Retro PI Challenge.
         PIT   :   'I FEEL A DRAFT'
 
     Manufacturing steps
-        If you don't have Python installed, you can install the latest version
-        from the Windows Store (We tested with Python 3.8).
-        Clone the repo to get the python code.
-        Open up a Powershell Window and go to the directory {repo}/source/frontend
-        Then execute 'py PIWumpus.py' to start the gaem.
-    
+        FRONTEND 
+        - If you don't have Python installed, you can install the latest version from the Windows Store (We tested with Python 3.8).
+        - Clone the repo to get the python code.
+        - Open up a Powershell Window and go to the directory {repo}/source/frontend
+        - Then execute 'py PIWumpus.py' to start the game.
+        
+        BACKEND
+        - TBD
