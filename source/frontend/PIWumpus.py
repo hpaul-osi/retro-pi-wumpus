@@ -186,9 +186,8 @@ async def convert_cmd_to_request(command, session):
             WumpusGameEngine.show_instructions()
         else:
             error = True
-
     if error==True:
-        print_part(" **What??")
+        print_part(" **WHAT??")
     else:
         erase_line(INPUT_LINE + 1)
 
