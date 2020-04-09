@@ -143,9 +143,17 @@ async def get_cmd(session):
     return cmd
 
 async def idle(session):
-    # TODO poll server for chats
-    add_chat("TODO: Print other users commands")
-    # TODO poll server for round results
+    global last_chat_time
+
+    chats = []
+    current_time = time.localtime
+    if last_chat_time != "":
+        chats = await getRecentChats(session, last_chat_time)
+    last_chat_time = current_time
+
+    for chat in chats:
+        add_chat(chat)
+
     await getTryGetResult(session)
 
 async def game_screen(session):
@@ -241,6 +249,10 @@ async def getTryGetResult(session):
     async with session.get(fullurl) as response:
         return await response.text()
 
+# TODO: everything
+async def getRecentChats(session, last_chat_time):
+    return [ "Jeremy, does this annoy you?"]
+
 async def main():
     global login
 
@@ -255,12 +267,16 @@ async def main():
     print("PLEASE ENTER YOUR NAME, HANDLE, OR OTHER IDENTIFIER:")
 
     async with aiohttp.ClientSession() as session:
+        global last_chat_time
+
         login = input()
         await postRegisterUser(session)
         await lobby_screen(session, login)
 
         clear_screen()
         WumpusGameEngine.banner()
+
+        last_chat_time = ""
         await game_screen(session)
 
 if __name__ == "__main__":
