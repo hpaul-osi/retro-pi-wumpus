@@ -4,6 +4,7 @@ import kbhit
 import os
 import sys
 import time
+import ctypes
 import WumpusGameEngine
 
 # Constants
@@ -17,10 +18,38 @@ INPUT_LINE = 24
 
 REFRESH_INTERVAL = 0.5
 
-HOST = 'localhost'
-PORT = '8080'
+HOST = 'votepolling.azurewebsites.net'
+PORT = '443'
+TOKEN = '' # DON'T CHECK ME IN
 
 # Utils
+def set_font(font_name):
+    LF_FACESIZE = 32
+    STD_OUTPUT_HANDLE = -11
+
+    class COORD(ctypes.Structure):
+        _fields_ = [("X", ctypes.c_short), ("Y", ctypes.c_short)]
+
+    class CONSOLE_FONT_INFOEX(ctypes.Structure):
+        _fields_ = [("cbSize", ctypes.c_ulong),
+                    ("nFont", ctypes.c_ulong),
+                    ("dwFontSize", COORD),
+                    ("FontFamily", ctypes.c_uint),
+                    ("FontWeight", ctypes.c_uint),
+                    ("FaceName", ctypes.c_wchar * LF_FACESIZE)]
+
+    font = CONSOLE_FONT_INFOEX()
+    font.cbSize = ctypes.sizeof(CONSOLE_FONT_INFOEX)
+    font.nFont = 12
+    font.dwFontSize.X = 11
+    font.dwFontSize.Y = 18
+    font.FontFamily = 54
+    font.FontWeight = 400
+    font.FaceName = font_name
+
+    handle = ctypes.windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+    ctypes.windll.kernel32.SetCurrentConsoleFontEx(handle, ctypes.c_long(False), ctypes.pointer(font))
+
 def enable_ansi():
     if sys.platform[0 : 3] == "win":
         os.system('')
@@ -109,7 +138,7 @@ async def idle(session):
     # TODO poll server for chats
     add_chat("TODO: Print other users commands")
     # TODO poll server for round results
-    await tryGetVoteResult(session, URL)
+    await tryGetVoteResult(session, BASEURL)
 
 async def game_screen(session):
     clear_screen()
@@ -120,6 +149,7 @@ async def game_screen(session):
     while True:
         cmd = get_cmd()
         print()
+        
         await convert_cmd_to_request(cmd, session)
         await idle(session)
 
@@ -140,10 +170,10 @@ async def convert_cmd_to_request(command, session):
         if (isInteger(split_command[1])):
             if (split_command[0] == "MOVE" or split_command[0] == "M"):
                 print("Sending Server Vote for MOVE")
-                await postMoveVote(session, URL, {"MOVE" : split_command[1]})
+                await postMoveVote(session, BASEURL, {"WumpusAction" : "Move", "Room" : split_command[1], "MoveNumber" : WumpusGameEngine.moveCount, "UserName" : login})
             elif (split_command[0] == "SHOOT" or split_command[0] == "S"):
                 print("Sending Server Vote for SHOOT")
-                await postMoveVote(session, URL, {"SHOOT" : split_command[1]})
+                await postMoveVote(session, BASEURL, {"WumpusAction" : "Shoot", "Room" : split_command[1], "MoveNumber" : WumpusGameEngine.moveCount, "UserName" : login})
             else:
                 error = True
         else:
@@ -162,35 +192,43 @@ async def convert_cmd_to_request(command, session):
     else:
         erase_line(INPUT_LINE + 1)
 
-async def postMoveVote(session, url, data):
-    # InsertValue API call
-    async with session.post(url, json=data) as response:
+async def postMoveVote(session, baseurl, data):
+    # InsertVote API call
+    fullurl = '{}/{}?code={}'.format(baseurl,'InsertVote',TOKEN)
+    async with session.post(fullurl, json=data) as response:
         return await response.text()
 
-async def postStartGame(session, url, data):
+async def postStartGame(session, baseurl, data):
     # StartGame API call
-    async with session.post(url, json=data) as response:
+    fullurl = '{}/{}?code={}'.format(baseurl,'StartGame',TOKEN)
+    async with session.post(fullurl, json=data) as response:
         return await response.text()
 
-async def postRegisterUser(session, url, data):
+async def postRegisterUser(session, baseurl):
     # RegisterUser API call
-    async with session.post(url, json=data) as response:
+    fullurl = '{}/{}?code={}&name={}'.format(baseurl,'RegisterUser',TOKEN,WumpusGameEngine.Player)
+    async with session.post(fullurl) as response:
         return await response.text()
 
-async def getListUsers(session, url):
+async def getListUsers(session, baseurl):
     # ListUsers API call
-    async with session.get(url) as response:
+    fullurl = '{}/{}?code={}'.format(baseurl,'ListUsers',TOKEN)
+    async with session.get(fullurl) as response:
         return await response.text()
 
 # TODO: need to add round number...
-async def tryGetVoteResult(session, url):
+async def tryGetVoteResult(session, baseurl):
     # TryGetAgreggate API call
-    async with session.get(url) as response:
+    fullurl = '{}/{}?code={}&roundnumber={}'.format(baseurl,'TryGetResult',TOKEN,WumpusGameEngine.moveCount) 
+    async with session.get(fullurl) as response:
         return await response.text()
 
 async def main():
-    global URL
-    
+    global BASEURL
+    global login
+
+    set_font("OCR A Extended")
+
     enable_ansi()
     WumpusGameEngine.init()
 
@@ -206,7 +244,7 @@ async def main():
     WumpusGameEngine.banner()
 
     async with aiohttp.ClientSession() as session:
-        URL = 'http://{}:{}'.format(HOST, PORT)
+        BASEURL = 'https://{}:{}/api'.format(HOST, PORT)
         await game_screen(session)
 
 if __name__ == "__main__":
