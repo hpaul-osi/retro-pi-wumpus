@@ -68,11 +68,11 @@ def list_users():
 
 def lobby_screen(login):
     clear_screen()
-    print("Hello {}! You are now in the lobby. Other people here are:".format(login))
+    print("HELLO {}! YOU ARE NOW IN THE LOBBY. OTHER PEOPLE HERE ARE:".format(login))
     print()
     list_users()
     print()
-    print("Press the ENTER (or RETURN) key to start with the current players")
+    print("PRESS THE [ENTER] (OR [RETURN]) KEY TO SIGNAL YOU ARE READY TO START.")
     while True:
         input = input_async(REFRESH_INTERVAL, echo=False)
         if len(input) > 0 and input[-1]==CR:
@@ -151,6 +151,7 @@ async def convert_cmd_to_request(command, session):
         if (command == "HELP" or command == "H"):
             print("Requesting help...")
             WumpusGameEngine.show_instructions()
+            
 
 async def postMoveVote(session, url, data):
     # InsertValue API call
@@ -185,9 +186,9 @@ async def main():
     WumpusGameEngine.init()
 
     clear_screen()
-    print("Welcome to PI Wumpus!")
+    print("WELCOME TO PI WUMPUS!")
     print()
-    print("Please enter your name, handle, or other identifier:")
+    print("PLEASE ENTER YOUR NAME, HANDLE, OR OTHER IDENTIFIER:")
 
     login = input()
     lobby_screen(login)
