@@ -252,6 +252,7 @@ async def getTryGetResult(session):
 
 # TODO: everything
 async def getRecentChats(session, last_chat_time):
+    return []
     fullurl = 'https://{}:{}/api/{}?timestamp={},movenumber={}'.format(GAMEHOST,PORT,'VotesAfterTime',last_chat_time, WumpusGameEngine.moveCount) 
     async with session.get(fullurl) as response:
         return await response.text()
