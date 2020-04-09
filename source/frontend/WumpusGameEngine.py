@@ -81,7 +81,7 @@ class Room:
 
     def remove_connect(self, arg_connect):
         if arg_connect in self.connects_to:
-            self.connects_to.remove(arg_connects)
+            self.connects_to.remove(arg_connect)
 
     def add_connect(self, arg_connect):
         if arg_connect not in self.connects_to:
@@ -176,6 +176,8 @@ def create_cave():
             Cave[idx +10].add_connect(room.number) #It connects to me.
 
 def executeMove(raw_command):
+    moveCount = moveCount + 1
+
     command_list = raw_command.split(' ')
     command = command_list[0].upper()
     if len(command_list) > 1:
@@ -262,45 +264,6 @@ def displayRoomInfo():
         if Bats1.location.number == room or Bats2.location.number == room:
             print("Bats nearby!")
 
-""" def sendVote(command, moveCount):
-    return True
-
-def getPollingResults(moveCount):
-    return True """
-
-"""
-def polling():
-    while True:
-        global moveCount
-        global Player
-
-        time.sleep(1)
-
-        #TODO call server API to get polling results
-
-        #result = getPollingResults(moveCount)
-        #if (len(result) > 0):
-        #   executeMove(command)
-        #   moveCount += 1
-        #   displayRoomInfo()
-        #   print("\n> ");
-
-        #this code is temporary until we have API calls in place
-        now = datetime.datetime.now()
-        seconds = now.strftime("%S")
-        if (int(seconds) % 10 == 0):
-            room =Player.location
-            connects = room.get_connects()
-            randomConnect = random.choice(connects)
-            result = "M " + str(randomConnect)
-            print ("Executing move " + str(moveCount))
-            executeMove(result)
-            moveCount += 1
-            displayRoomInfo()
-            print("\n> ")
-"""
-
-# PIWumpus.py entry points
 def init():
     global Arrows
     global Wumpus
@@ -320,12 +283,6 @@ def init():
     Wumpus, Player, Pit1, Pit2, Bats1, Bats2 = create_things(Cave)
 
     Arrows = 5
-
-"""
-def start_game():
-    #create therad for polling and game execution
-    threading._start_new_thread(polling, ())
-"""
 
 def banner():
     print("""\n   Welcome to the cave, Great White Hunter.
