@@ -246,7 +246,7 @@ async def getListUsers(session):
 # TODO: need to add round number...
 async def getTryGetResult(session):
     # TryGetAgreggate API call
-    fullurl = 'https://{}:{}/api/{}?noteroundnumber={}'.format(GAMEHOST,PORT,'TryGetResult',WumpusGameEngine.moveCount) 
+    fullurl = 'https://{}:{}/api/{}?voteroundnumber={}'.format(GAMEHOST,PORT,'TryGetResult',WumpusGameEngine.moveCount) 
     async with session.get(fullurl) as response:
         return await response.text()
 
