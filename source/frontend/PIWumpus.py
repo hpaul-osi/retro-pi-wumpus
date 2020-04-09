@@ -217,7 +217,7 @@ async def main():
     global BASEURL
     global login
 
-    set_font("Impact")
+    set_font("OCR A Extended")
 
     enable_ansi()
     WumpusGameEngine.init()
