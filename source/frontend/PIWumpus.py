@@ -68,7 +68,7 @@ def list_users():
 
 def lobby_screen(login):
     clear_screen()
-    print("Hello {}! You are now in the lobby. Other people here are:".format(login))
+    print("Hello {}! You are now in the lobby. Other nervous engineers that are avoiding eye contact are:".format(login))
     print()
     list_users()
     print()
@@ -98,18 +98,18 @@ def get_cmd():
         print_part("> {}".format(cmd))
 
         input = input_async(REFRESH_INTERVAL)
-        if len(input) > 0 and input[-1]==CR:
-            input = input.rstrip()
+        cmd += input
+        if len(cmd) > 0 and cmd[-1]==CR:
+            cmd = cmd.rstrip()
             done = True
             break
-        cmd += input
     return cmd
 
-def idle(session):
+async def idle(session):
     # TODO poll server for chats
     add_chat("TODO: Print other users commands")
     # TODO poll server for round results
-    tryGetVoteResult(session, URL)
+    await tryGetVoteResult(session, URL)
 
 async def game_screen(session):
     clear_screen()
@@ -146,6 +146,7 @@ async def convert_cmd_to_request(command, session):
                 await postMoveVote(session, URL, {"SHOOT" : split_command[1]})
     else:
         if (command == "QUIT" or command == "Q"):
+            sys.exit(0)
             # TODO: Client gracefully exits the game
             print("TODO: Client gracefully exits the game")
         if (command == "HELP" or command == "H"):
