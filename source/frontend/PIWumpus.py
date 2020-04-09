@@ -108,6 +108,8 @@ async def lobby_screen(session, login):
     while True:
         input = input_async(REFRESH_INTERVAL, echo=False)
         if len(input) > 0 and input[-1]==CR:
+            await postStopGame(session)
+            await postStartGame(session)
             break
 
 chat_line = CHAT_START
@@ -220,6 +222,12 @@ async def postRegisterUser(session):
     async with session.post(fullurl) as response:
         return await response.text()
 
+async def postExitGame(session):
+    # ExitGame API call
+    fullurl = 'https://{}:{}/api/{}/?user={}'.format(GAMEHOST,PORT,'ExitGame',login)
+    async with session.post(fullurl) as response:
+        return await response.text()
+
 async def getListUsers(session):
     # ListUsers API call
     fullurl = 'https://{}:{}/api/{}'.format(GAMEHOST,PORT,'ListUsers')
@@ -248,6 +256,7 @@ async def main():
 
     async with aiohttp.ClientSession() as session:
         login = input()
+        await postRegisterUser(session)
         await lobby_screen(session, login)
 
         clear_screen()
