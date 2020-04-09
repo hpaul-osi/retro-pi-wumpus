@@ -148,10 +148,10 @@ async def game_screen(session):
     WumpusGameEngine.displayRoomInfo()
     while True:
         cmd = get_cmd()
-        await idle(session)
         print()
+        
         await convert_cmd_to_request(cmd, session)
-        print("TODO: Send '{}' to server".format(cmd))
+        await idle(session)
 
 def isInteger(value):
     try:
@@ -163,7 +163,8 @@ def isInteger(value):
 async def convert_cmd_to_request(command, session):
     # JSH Assumption: It is better to have parsed the command into constituent parts for the backend
     # Move (M), Shoot (S), or Quit (Q)
-    # TODO: We need to validate input sent to server.
+
+    error = False
     split_command = command.split()
     if len(split_command) > 1:
         if (isInteger(split_command[1])):
@@ -173,14 +174,23 @@ async def convert_cmd_to_request(command, session):
             elif (split_command[0] == "SHOOT" or split_command[0] == "S"):
                 print("Sending Server Vote for SHOOT")
                 await postMoveVote(session, BASEURL, {"WumpusAction" : "Shoot", "Room" : split_command[1], "MoveNumber" : WumpusGameEngine.moveCount, "UserName" : login})
+            else:
+                error = True
+        else:
+            error = True
     else:
         if (command == "QUIT" or command == "Q"):
             sys.exit(0)
-            # TODO: Client gracefully exits the game
-            print("TODO: Client gracefully exits the game")
-        if (command == "HELP" or command == "H"):
+        elif (command == "HELP" or command == "H"):
             print("Requesting help...")
             WumpusGameEngine.show_instructions()
+        else:
+            error = True
+
+    if error==True:
+        print_part(" **What??")
+    else:
+        erase_line(INPUT_LINE + 1)
 
 async def postMoveVote(session, baseurl, data):
     # InsertVote API call
