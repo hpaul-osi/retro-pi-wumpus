@@ -81,7 +81,7 @@ class Room:
 
     def remove_connect(self, arg_connect):
         if arg_connect in self.connects_to:
-            self.connects_to.remove(arg_connects)
+            self.connects_to.remove(arg_connect)
 
     def add_connect(self, arg_connect):
         if arg_connect not in self.connects_to:
