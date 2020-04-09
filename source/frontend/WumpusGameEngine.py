@@ -268,6 +268,7 @@ def displayRoomInfo():
 def getPollingResults(moveCount):
     return True """
 
+"""
 def polling():
     while True:
         global moveCount
@@ -297,6 +298,7 @@ def polling():
             moveCount += 1
             displayRoomInfo()
             print("\n> ")
+"""
 
 # PIWumpus.py entry points
 def init():
@@ -319,9 +321,11 @@ def init():
 
     Arrows = 5
 
+"""
 def start_game():
     #create therad for polling and game execution
     threading._start_new_thread(polling, ())
+"""
 
 def banner():
     print("""\n   Welcome to the cave, Great White Hunter.

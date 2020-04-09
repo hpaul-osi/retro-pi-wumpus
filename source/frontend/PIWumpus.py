@@ -5,7 +5,13 @@ import time
 import WumpusGameEngine
 
 ESC = chr(27)
+ANSI = ESC + "["
 CR = chr(13)
+
+CHAT_START = 8
+CHAT_END = 22
+INPUT_LINE = 24
+
 REFRESH_INTERVAL = 1
 
 HOST = 'localhost'
@@ -19,7 +25,18 @@ def enable_ansi():
         os.system('')
 
 def clear_screen():
-    print(ESC + "[2J")
+    print_part(ANSI + "2J")
+
+def move_line(n):
+    print_part(ANSI + str(n) + "H")
+
+def erase_line(n):
+    move_line(n)
+    print_part(ANSI + "K")
+
+def erase_lines(start, end):
+    for line in range(start, end + 1):
+        erase_line(line)
 
 def print_part(s):
     print(s, end="", flush=True)
@@ -31,7 +48,7 @@ def input_async(timeout, echo=True):
     elapsed = 0
     while True:
         if kb.kbhit():
-            c = kb.getch()
+            c = kb.getch().capitalize()
             ret += c
             if echo==True:
                 print_part(c)
@@ -60,24 +77,50 @@ def lobby_screen(login):
         if len(input) > 0 and input[-1]==CR:
             break
 
+chat_line = CHAT_START
+
+def add_chat(s):
+    global chat_line
+
+    move_line(chat_line)
+    print_part(s)
+    chat_line = chat_line + 1
+    if (chat_line > CHAT_END):
+        chat_line = CHAT_START
+        erase_lines(CHAT_START, CHAT_END)
+
 def get_cmd():
-    print_part("> ")
+    cmd = ""
 
     while True:
+        erase_line(INPUT_LINE)
+        print_part("> {}".format(cmd))
+
         input = input_async(REFRESH_INTERVAL)
         if len(input) > 0 and input[-1]==CR:
+            input = input.rstrip()
+            done = True
             break
-        # print("TODO: Print other users commands")
-    return input
+        cmd += input
+
+        idle()
+    return cmd
+
+def idle():
+    add_chat("TODO: Print other users commands")
+    # poll server
 
 def game_screen():
-    print("Hold down CTRL and press C to quit ...")
+    clear_screen()
+    print("Hold down CTRL and press C (and ignore the call stack) to quit ...")
+    print()
 
     WumpusGameEngine.displayRoomInfo()
     while True:
         cmd = get_cmd()
         print()
         convert_cmd_to_data(cmd)
+        print("TODO: Send '{}' to server".format(cmd))
 
 def convert_cmd_to_data(command):
     # JSH Assumption: It is better to have parsed the command into constituent parts for the backend
@@ -144,7 +187,6 @@ def main():
     clear_screen()
 
     WumpusGameEngine.banner()
-    WumpusGameEngine.start_game()
     game_screen()
 
 if __name__ == "__main__":
