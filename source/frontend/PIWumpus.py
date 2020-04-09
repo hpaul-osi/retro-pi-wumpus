@@ -129,8 +129,8 @@ def main():
     lobby_screen(login)
 
     clear_screen()
-
     WumpusGameEngine.banner()
+
     game_screen()
 
 if __name__ == "__main__":
