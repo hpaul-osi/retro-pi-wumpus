@@ -19,12 +19,16 @@ moveCount = 0
 
 def show_instructions():
     print ("""
-        WELCOME TO 'HUNT THE WUMPUS'
-        THE WUMPUS LIVES IN A CAVE OF 20 ROOMS. EACH ROOM
+        WELCOME TO 'PI_WUMPUS'
+        THE WUMPUS LIVES IN A DUNGEON UNDERNEATH THE OSISOFT(TM) 
+        HEADQUARTERS IN SAN LEANDRO, CA.OF 20 ROOMS. EACH ROOM
         HAS 3 TUNNELS LEADING TO OTHER ROOMS. (LOOK AT A
         DODECAHEDRON TO SEE HOW THIS WORKS-IF YOU DON'T KNOW
-        WHAT A DODECHADRON IS, ASK SOMEONE, or Google it.)
-        
+        WHAT A DODECHADRON IS, ASK SOMEONE, OR USE ALTA VISTA.)
+        """)
+    temp = input('PRESS [ENTER] TO CONTINUE...')
+
+    print ("""    
     HAZARDS:
         BOTTOMLESS PITS: TWO ROOMS HAVE BOTTOMLESS PITS IN THEM
         IF YOU GO THERE, YOU FALL INTO THE PIT (& LOSE!)
@@ -32,31 +36,47 @@ def show_instructions():
         GO THERE, A BAT GRABS YOU AND TAKES YOU TO SOME OTHER
         ROOM AT RANDOM. (WHICH MIGHT BE TROUBLESOME)
 
+        """)
+    temp = input("PRESS [ENTER] TO CONTINUE...")
+
+    print("""
     WUMPUS:
-        THE WUMPUS IS NOT BOTHERED BY THE HAZARDS (HE HAS SUCKER
-        FEET AND IS TOO BIG FOR A BAT TO LIFT). USUALLY
-        HE IS ASLEEP. TWO THINGS THAT WAKE HIM UP: YOUR ENTERING
-        HIS ROOM OR YOUR SHOOTING AN ARROW.
-        IF THE WUMPUS WAKES, HE MOVES (P=.75) ONE ROOM
+        THE WUMPUS, A NON-NATIVE AND INVASIVE SPECIES, HAS A 
+        HABIT FOR REORGANIZING ETHERNET CABLES THAT CAUSE 
+        NETWORK INTERUPTION ACROSS A COMPANY. THE WUMPUS IS NOT 
+        BOTHERED BY THE HAZARDS (HE HAS SUCKER FEET AND IS TOO 
+        BIG FOR A BAT TO LIFT). USUALLY HE IS ASLEEP. TWO THINGS 
+        THAT WAKE HIM UP: YOUR ENTERING HIS ROOM OR YOUR SHOOTING 
+        AN ARROW. IF THE WUMPUS WAKES, HE MOVES (P=.75) ONE ROOM
         OR STAYS STILL (P=.25). AFTER THAT, IF HE IS WHERE YOU
         ARE, HE TRAMPLES YOU (& YOU LOSE!).
+        """)
+    temp = input("PRESS [ENTER] TO CONTINUE...")
 
+    print ("""
     YOU:
-        EACH TURN YOU MAY MOVE OR SHOOT AN ARROW
+        YOUR ARE AN OSISOFT ENGINEER WHO, ALONG WITH THEIR FELLOW
+        ENGINEERS, HAVE BEEN SENT INTO THE DUNGEON TO STOP THE 
+        WUMPUS. EACH TURN YOU MAY MOVE OR SHOOT AN ARROW
         MOVING: YOU CAN GO ONE ROOM (THRU ONE TUNNEL)
         ARROWS: YOU HAVE 5 ARROWS. YOU LOSE WHEN YOU RUN
         OUT. YOU AIM BY TELLING
         THE COMPUTER THE ROOM YOU WANT THE ARROW TO GO TO.
         IF THE ARROW HITS THE WUMPUS, YOU WIN.
 
+        """)
+    temp = input("PRESS [ENTER] TO CONTINUE...")
+    
+    print ("""
     WARNINGS:
         WHEN YOU ARE ONE ROOM AWAY FROM WUMPUS OR A HAZARD,
         THE COMPUTER SAYS:
         WUMPUS:   'I SMELL A WUMPUS'
         BAT   :   'BATS NEAR BY'
         PIT   :   'I FEEL A DRAFT'
+        
         """)
-
+    temp = input("PRESS [ENTER] TO CONTINUE...")
 
 class Room:
     """Defines a room. 
@@ -100,7 +120,7 @@ class Room:
         if len(self.description) > 0:
             print(self.description)
         else:
-            print("You are in room {}.\nPassages lead to {}".format(self.number, self.connects_to))
+            print("YOU ARE IN ROOM {}.\nPASSAGES LEAD TO {}".format(self.number, self.connects_to))
         
 
 class Thing:
@@ -184,7 +204,7 @@ def executeMove(raw_command):
         try:
             move = Cave[int(command_list[1]) -1]
         except:
-            print("\n **What??")
+            print("\n **WHAT??")
             return
     else:
         move = Player.location
@@ -194,7 +214,7 @@ def executeMove(raw_command):
         return
 
     elif command == 'QUIT' or command == 'Q':
-        print("\nOK, Bye.")
+        print("\nOK, BYE.")
         sys.exit()
 
     elif command == 'MOVE' or command == 'M':
@@ -203,30 +223,30 @@ def executeMove(raw_command):
                 print("... OOPS! BUMPED A WUMPUS!")
                 Wumpus.wakeup(Cave)
         else:
-            print("\n **You can't get there from here")
+            print("\n **YOU CAN'T GET THERE FROM HERE.")
             return
 
     elif command == 'SHOOT' or command == 'S':
         if Player.validate_move(move):
-            print("\n-Twang-") 
+            print("\n-TWANG-") 
             if Wumpus.location == move:
-                print("\n Good Shooting!! You hit the Wumpus. \n Wumpi will have their revenge.\n")
-                print ("Press ENTER key to exit\n")
+                print("\n GOOD SHOOTING!! YOU HIT THE WUMPUS. \n THE WUMPI WILL HAVE THEIR REVENGE.\n")
+                print ("PRESS [ENTER] TO EXIT.\n")
                 input()
                 sys.exit()    
         else:
-            print("\n** Stop trying to shoot through walls.")
+            print("\n** STOP TRYING TO SHOOT THROUGH WALLS.")
 
         Wumpus.wakeup(Cave)
         Arrows -= 1
         if Arrows == 0:
-            print("\n You are out of arrows\n Better luck next time\n")
-            print ("Press ENTER key to exit\n")
+            print("\n YOU ARE OUT OF ARROWS\n BETTER LUCK NEXT TIME\n")
+            print ("PRESS [ENTER] KEY TO EXIT\n")
             input()
             sys.exit()    
     
     else:
-        print("\n **What?")
+        print("\n **WHAT?")
         return
 
     # By now the player has moved. See what happened.
@@ -238,13 +258,13 @@ def executeMove(raw_command):
 
     if Player.location == Wumpus.location:
         print("TROMP TROMP - WUMPUS GOT YOU!\n")
-        print ("Press ENTER key to exit\n")
+        print ("PRESS [ENTER] KEY TO EXIT\n")
         input()
         sys.exit()    
 
     elif Player.location == Pit1.location or Player.location == Pit2.location:
-        print("YYYIIIIEEEE . . . FELL INTO A PIT!\n China here we come!\n")
-        print ("Press ENTER key to exit\n")
+        print("YYYIIIIEEEE . . . FELL INTO A PIT!\n PHILADELPHIA HERE WE COME!\n")
+        print ("PRESS [ENTER] KEY TO EXIT\n")
         input()
         sys.exit()    
 
@@ -258,11 +278,11 @@ def displayRoomInfo():
     #Check each <Player.location.connects_to> for hazards.
     for room in Player.location.connects_to:
         if Wumpus.location.number == room:
-            print("I smell a Wumpus!")
+            print("I SMELL A WUMPUS!")
         if Pit1.location.number == room or Pit2.location.number == room:
-            print("I feel a draft!")
+            print("I FEEL A DRAFT!")
         if Bats1.location.number == room or Bats2.location.number == room:
-            print("Bats nearby!")
+            print("BATS NEARBY!")
 
 def init():
     global Arrows
@@ -285,11 +305,11 @@ def init():
     Arrows = 5
 
 def banner():
-    print("""\n   Welcome to the cave, Great White Hunter.
-    You are hunting the Wumpus.
-    On any turn you can move or shoot.
-    Commands are entered in the form of ACTION LOCATION
-    IE: 'SHOOT 12' or 'MOVE 8'
-    type 'HELP' for instructions.
-    'QUIT' to end the game.
+    print("""\n   WELCOME TO THE CAVE, GREAT WHITE HUNTER.
+    YOU ARE HUNTING THE WUMPUS.
+    ON ANY TURN YOU CAN MOVE OR SHOOT.
+    COMMANDS ARE ENTERED IN THE FORM OF ACTION LOCATION
+    IE: 'SHOOT 12' OR 'MOVE 8'
+    TYPE 'HELP' FOR INSTRUCTIONS.
+    'QUIT' TO END THE GAME.
     """)

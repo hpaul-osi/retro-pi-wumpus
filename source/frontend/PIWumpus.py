@@ -100,11 +100,11 @@ async def list_users(session):
 
 async def lobby_screen(session, login):
     clear_screen()
-    print("Hello {}! You are now in the lobby. Other nervous engineers that are avoiding eye contact are:".format(login))
+    print("HELLO {}! YOU ARE NOW IN THE LOBBY. OTHER NERVOUS ENGINEERS THAT ARE AVOIDING EYE CONTACT ARE:".format(login))
     print()
     await list_users(session)
     print()
-    print("Press the ENTER (or RETURN) key to start with the current players")
+    print("PRESS THE [ENTER] (OR [RETURN]) KEY TO SIGNAL YOU ARE READY TO START.")
     while True:
         input = input_async(REFRESH_INTERVAL, echo=False)
         if len(input) > 0 and input[-1]==CR:
@@ -192,7 +192,7 @@ async def convert_cmd_to_request(command, session):
     if error==True:
         print_part(" **WHAT??")
     else:
-        erase_line(INPUT_LINE + 1)
+        erase_line(INPUT_LINE + 1)  
 
 async def postInsertVote(session, data):
     # InsertVote API call
@@ -240,9 +240,9 @@ async def main():
     WumpusGameEngine.init()
 
     clear_screen()
-    print("Welcome to PI Wumpus!")
+    print("WELCOME TO PI WUMPUS!")
     print()
-    print("Please enter your name, handle, or other identifier:")
+    print("PLEASE ENTER YOUR NAME, HANDLE, OR OTHER IDENTIFIER:")
 
     async with aiohttp.ClientSession() as session:
         login = input()
