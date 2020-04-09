@@ -13,15 +13,15 @@ namespace VotePolling
 {    
     public class SDSWumpusData
     {
-        private string _wumpusType = "WumpusActionVoteV7";
-        private string _gameStream = "WumpusGameStreamV7";
+        private string _wumpusType = "WumpusActionVoteV8";
+        private string _gameStream = "WumpusGameStreamV8";
         private string _wumpusDescription = "Wumpus Action Vote stream with action enum.";
 
         private string tenantId = "906a9f59-2c0b-4ebf-b554-83be70f62758"; // configuration["TenantId"];
         private string namespaceId = "Wumpus"; // configuration["NamespaceId"];
         private string resource = "https://staging.osipi.com"; // configuration["Resource"];
         private string clientId = "4e7605fb-4ba3-4151-9fa1-9dc12adc0bf7"; // configuration["ClientId"];
-        private string clientKey = "k+GZncLFtRsmcNXPzJxdv+wODBMnVUVIBUx6qRZ9NwY="; // configuration["ClientKey"];
+        private string clientKey = ""; // configuration["ClientKey"];
 
         private AuthenticationHandler authenticationHandler;
         private SdsService sdsService;
@@ -49,12 +49,12 @@ namespace VotePolling
             simpleType.Id = _wumpusType;
             simpleType.Name = _wumpusType;
             simpleType.Description = "Wumpus Action Vote stream with action enum.";
-            var retType = await metadataService.GetTypeAsync(simpleType.Id);
+            /*var retType = await metadataService.GetTypeAsync(simpleType.Id);
 
             if (retType != null)
             {
                 return retType;
-            }
+            }*/
 
             var type = await metadataService.GetOrCreateTypeAsync(simpleType);
 
@@ -70,12 +70,12 @@ namespace VotePolling
                 TypeId = _wumpusType,
                 Description = "This is a sample SdsStream for storing WaveData type measurements"
             };
-            var retStream = await metadataService.GetStreamAsync(stream.Id);
+            /*var retStream = await metadataService.GetStreamAsync(stream.Id);
 
             if (retStream != null)
             {
                 return retStream;
-            }
+            }*/
             stream = await metadataService.GetOrCreateStreamAsync(stream);
 
             return stream;

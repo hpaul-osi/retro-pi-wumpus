@@ -23,11 +23,12 @@ namespace VotePolling
             log.LogInformation("C# HTTP trigger function processed a request.");            
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var data = JsonConvert.DeserializeObject<WumpusActionVote>(requestBody);            
+            var data = JsonConvert.DeserializeObject<WumpusActionVote>(requestBody);
+            data.TimeStamp = DateTime.Now;
 
             var sDSWumpusData = new SDSWumpusData();            
-            await sDSWumpusData.GetOrCreateWumpusType();
-            await sDSWumpusData.GetOrCreateWumpusStream();
+            // await sDSWumpusData.GetOrCreateWumpusType();
+            // await sDSWumpusData.GetOrCreateWumpusStream();
             try
             {
                 await sDSWumpusData.InsertWumpusValue(data);
