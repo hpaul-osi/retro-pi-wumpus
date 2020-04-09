@@ -187,10 +187,8 @@ async def convert_cmd_to_request(command, session):
     if len(split_command) > 1:
         if (isInteger(split_command[1])):
             if (split_command[0] == "MOVE" or split_command[0] == "M"):
-                print("Sending Server Vote for MOVE")
                 await postInsertVote(session, {"WumpusAction" : "Move", "Room" : split_command[1], "MoveNumber" : WumpusGameEngine.moveCount, "UserName" : login})
             elif (split_command[0] == "SHOOT" or split_command[0] == "S"):
-                print("Sending Server Vote for SHOOT")
                 await postInsertVote(session, {"WumpusAction" : "Shoot", "Room" : split_command[1], "MoveNumber" : WumpusGameEngine.moveCount, "UserName" : login})
             else:
                 error = True
@@ -200,7 +198,6 @@ async def convert_cmd_to_request(command, session):
         if (command == "QUIT" or command == "Q"):
             sys.exit(0)
         elif (command == "HELP" or command == "H"):
-            print("Requesting help...")
             WumpusGameEngine.show_instructions()
         else:
             error = True
