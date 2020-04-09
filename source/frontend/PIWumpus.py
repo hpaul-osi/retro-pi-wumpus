@@ -17,10 +17,11 @@ CHAT_END = 22
 INPUT_LINE = 24
 
 REFRESH_INTERVAL = 0.5
-
-HOST = 'votepolling.azurewebsites.net'
+ 
+VOTEHOST = 'votepolling.azurewebsites.net'
+GAMEHOST = 'gambitwumpus.azurewebsites.net'
 PORT = '443'
-TOKEN = '' # DON'T CHECK ME IN
+TOKEN = 'wR3E5E8uSFvjuDs3aH5hEfqRvzzE3na3IeTvaLnfxVfsO65tvdB43w==' # API Key to send votes to Wumpus API.
 
 # Utils
 def set_font(font_name):
@@ -92,14 +93,16 @@ def input_async(timeout, echo=True):
     return ret
 
 # App Code
-def list_users():
+async def list_users(session):
     print("TODO: get and print users")
+    userlist = await getListUsers(session)
+    print("TODO: Loop through users in {}".format(userlist))
 
-def lobby_screen(login):
+async def lobby_screen(session, login):
     clear_screen()
     print("Hello {}! You are now in the lobby. Other nervous engineers that are avoiding eye contact are:".format(login))
     print()
-    list_users()
+    await list_users(session)
     print()
     print("Press the ENTER (or RETURN) key to start with the current players")
     while True:
@@ -138,7 +141,7 @@ async def idle(session):
     # TODO poll server for chats
     add_chat("TODO: Print other users commands")
     # TODO poll server for round results
-    await tryGetVoteResult(session, BASEURL)
+    await getTryGetResult(session)
 
 async def game_screen(session):
     clear_screen()
@@ -170,10 +173,10 @@ async def convert_cmd_to_request(command, session):
         if (isInteger(split_command[1])):
             if (split_command[0] == "MOVE" or split_command[0] == "M"):
                 print("Sending Server Vote for MOVE")
-                await postMoveVote(session, BASEURL, {"WumpusAction" : "Move", "Room" : split_command[1], "MoveNumber" : WumpusGameEngine.moveCount, "UserName" : login})
+                await postInsertVote(session, {"WumpusAction" : "Move", "Room" : split_command[1], "MoveNumber" : WumpusGameEngine.moveCount, "UserName" : login})
             elif (split_command[0] == "SHOOT" or split_command[0] == "S"):
                 print("Sending Server Vote for SHOOT")
-                await postMoveVote(session, BASEURL, {"WumpusAction" : "Shoot", "Room" : split_command[1], "MoveNumber" : WumpusGameEngine.moveCount, "UserName" : login})
+                await postInsertVote(session, {"WumpusAction" : "Shoot", "Room" : split_command[1], "MoveNumber" : WumpusGameEngine.moveCount, "UserName" : login})
             else:
                 error = True
         else:
@@ -191,39 +194,44 @@ async def convert_cmd_to_request(command, session):
     else:
         erase_line(INPUT_LINE + 1)
 
-async def postMoveVote(session, baseurl, data):
+async def postInsertVote(session, data):
     # InsertVote API call
-    fullurl = '{}/{}?code={}'.format(baseurl,'InsertVote',TOKEN)
+    fullurl = 'https://{}:{}/api/{}?code={}'.format(VOTEHOST,PORT,'InsertVote',TOKEN)
     async with session.post(fullurl, json=data) as response:
         return await response.text()
 
-async def postStartGame(session, baseurl, data):
+async def postStartGame(session):
     # StartGame API call
-    fullurl = '{}/{}?code={}'.format(baseurl,'StartGame',TOKEN)
-    async with session.post(fullurl, json=data) as response:
-        return await response.text()
-
-async def postRegisterUser(session, baseurl):
-    # RegisterUser API call
-    fullurl = '{}/{}?code={}&name={}'.format(baseurl,'RegisterUser',TOKEN,WumpusGameEngine.Player)
+    fullurl = 'https://{}:{}/api/{}/'.format(GAMEHOST,PORT,'StartGame')
     async with session.post(fullurl) as response:
         return await response.text()
 
-async def getListUsers(session, baseurl):
+async def postStopGame(session):
+    # StartGame API call
+    fullurl = 'https://{}:{}/api/{}/'.format(GAMEHOST,PORT,'StopGame')
+    async with session.post(fullurl) as response:
+        return await response.text()
+
+async def postRegisterUser(session):
+    # RegisterUser API call
+    fullurl = 'https://{}:{}/api/{}/?name={}'.format(GAMEHOST,PORT,'RegisterUser',login)
+    async with session.post(fullurl) as response:
+        return await response.text()
+
+async def getListUsers(session):
     # ListUsers API call
-    fullurl = '{}/{}?code={}'.format(baseurl,'ListUsers',TOKEN)
+    fullurl = 'https://{}:{}/api/{}'.format(GAMEHOST,PORT,'ListUsers')
     async with session.get(fullurl) as response:
         return await response.text()
 
 # TODO: need to add round number...
-async def tryGetVoteResult(session, baseurl):
+async def getTryGetResult(session):
     # TryGetAgreggate API call
-    fullurl = '{}/{}?code={}&roundnumber={}'.format(baseurl,'TryGetResult',TOKEN,WumpusGameEngine.moveCount) 
+    fullurl = 'https://{}:{}/api/{}?noteroundnumber={}'.format(GAMEHOST,PORT,'TryGetResult',WumpusGameEngine.moveCount) 
     async with session.get(fullurl) as response:
         return await response.text()
 
 async def main():
-    global BASEURL
     global login
 
     set_font("OCR A Extended")
@@ -236,14 +244,12 @@ async def main():
     print()
     print("Please enter your name, handle, or other identifier:")
 
-    login = input()
-    lobby_screen(login)
-
-    clear_screen()
-    WumpusGameEngine.banner()
-
     async with aiohttp.ClientSession() as session:
-        BASEURL = 'https://{}:{}/api'.format(HOST, PORT)
+        login = input()
+        await lobby_screen(session, login)
+
+        clear_screen()
+        WumpusGameEngine.banner()
         await game_screen(session)
 
 if __name__ == "__main__":
