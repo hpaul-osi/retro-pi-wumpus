@@ -4,6 +4,7 @@ import kbhit
 import os
 import sys
 import time
+import ctypes
 import WumpusGameEngine
 
 # Constants
@@ -23,6 +24,33 @@ PORT = '443'
 TOKEN = 'wR3E5E8uSFvjuDs3aH5hEfqRvzzE3na3IeTvaLnfxVfsO65tvdB43w==' # API Key to send votes to Wumpus API.
 
 # Utils
+def set_font(font_name):
+    LF_FACESIZE = 32
+    STD_OUTPUT_HANDLE = -11
+
+    class COORD(ctypes.Structure):
+        _fields_ = [("X", ctypes.c_short), ("Y", ctypes.c_short)]
+
+    class CONSOLE_FONT_INFOEX(ctypes.Structure):
+        _fields_ = [("cbSize", ctypes.c_ulong),
+                    ("nFont", ctypes.c_ulong),
+                    ("dwFontSize", COORD),
+                    ("FontFamily", ctypes.c_uint),
+                    ("FontWeight", ctypes.c_uint),
+                    ("FaceName", ctypes.c_wchar * LF_FACESIZE)]
+
+    font = CONSOLE_FONT_INFOEX()
+    font.cbSize = ctypes.sizeof(CONSOLE_FONT_INFOEX)
+    font.nFont = 12
+    font.dwFontSize.X = 11
+    font.dwFontSize.Y = 18
+    font.FontFamily = 54
+    font.FontWeight = 400
+    font.FaceName = font_name
+
+    handle = ctypes.windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
+    ctypes.windll.kernel32.SetCurrentConsoleFontEx(handle, ctypes.c_long(False), ctypes.pointer(font))
+
 def enable_ansi():
     if sys.platform[0 : 3] == "win":
         os.system('')
@@ -123,10 +151,10 @@ async def game_screen(session):
     WumpusGameEngine.displayRoomInfo()
     while True:
         cmd = get_cmd()
-        await idle(session)
         print()
+        
         await convert_cmd_to_request(cmd, session)
-        print("TODO: Send '{}' to server".format(cmd))
+        await idle(session)
 
 def isInteger(value):
     try:
@@ -138,7 +166,8 @@ def isInteger(value):
 async def convert_cmd_to_request(command, session):
     # JSH Assumption: It is better to have parsed the command into constituent parts for the backend
     # Move (M), Shoot (S), or Quit (Q)
-    # TODO: We need to validate input sent to server.
+
+    error = False
     split_command = command.split()
     if len(split_command) > 1:
         if (isInteger(split_command[1])):
@@ -148,14 +177,23 @@ async def convert_cmd_to_request(command, session):
             elif (split_command[0] == "SHOOT" or split_command[0] == "S"):
                 print("Sending Server Vote for SHOOT")
                 await postInsertVote(session, {"WumpusAction" : "Shoot", "Room" : split_command[1], "MoveNumber" : WumpusGameEngine.moveCount, "UserName" : login})
+            else:
+                error = True
+        else:
+            error = True
     else:
         if (command == "QUIT" or command == "Q"):
             sys.exit(0)
-            # TODO: Client gracefully exits the game
-            print("TODO: Client gracefully exits the game")
-        if (command == "HELP" or command == "H"):
+        elif (command == "HELP" or command == "H"):
             print("Requesting help...")
             WumpusGameEngine.show_instructions()
+        else:
+            error = True
+
+    if error==True:
+        print_part(" **What??")
+    else:
+        erase_line(INPUT_LINE + 1)
 
 async def postInsertVote(session, data):
     # InsertVote API call
@@ -196,6 +234,8 @@ async def getTryGetResult(session):
 
 async def main():
     global login
+
+    set_font("OCR A Extended")
 
     enable_ansi()
     WumpusGameEngine.init()
