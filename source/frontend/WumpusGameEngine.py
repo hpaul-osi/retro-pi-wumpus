@@ -16,6 +16,7 @@ import signal
 # globals
 Cave = []
 moveCount = 0
+GameOver = False
 
 def show_instructions():
     print ("""
@@ -215,7 +216,7 @@ def executeMove(raw_command):
 
     elif command == 'QUIT' or command == 'Q':
         print("\nOK, BYE.")
-        sys.exit()
+        GameOver = True
 
     elif command == 'MOVE' or command == 'M':
         if Player.move(move):
@@ -233,7 +234,7 @@ def executeMove(raw_command):
                 print("\n GOOD SHOOTING!! YOU HIT THE WUMPUS. \n THE WUMPI WILL HAVE THEIR REVENGE.\n")
                 print ("PRESS [ENTER] TO EXIT.\n")
                 input()
-                sys.exit()    
+                GameOver = True    
         else:
             print("\n** STOP TRYING TO SHOOT THROUGH WALLS.")
 
@@ -243,7 +244,7 @@ def executeMove(raw_command):
             print("\n YOU ARE OUT OF ARROWS\n BETTER LUCK NEXT TIME\n")
             print ("PRESS [ENTER] KEY TO EXIT\n")
             input()
-            sys.exit()    
+            GameOver = True  
     
     else:
         print("\n **WHAT?")
@@ -260,13 +261,13 @@ def executeMove(raw_command):
         print("TROMP TROMP - WUMPUS GOT YOU!\n")
         print ("PRESS [ENTER] KEY TO EXIT\n")
         input()
-        sys.exit()    
+        GameOver = True
 
     elif Player.location == Pit1.location or Player.location == Pit2.location:
         print("YYYIIIIEEEE . . . FELL INTO A PIT!\n PHILADELPHIA HERE WE COME!\n")
         print ("PRESS [ENTER] KEY TO EXIT\n")
         input()
-        sys.exit()    
+        GameOver = True    
 
     else: # Keep playing
         pass   

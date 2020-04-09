@@ -101,12 +101,20 @@ async def list_users(session):
 
 async def lobby_screen(session, login):
     clear_screen()
+    status = await getIsGameStarted(session)
+    if(status == 200):
+        print("HELLO {}! A GAME IS IN PROGRESS, PLEASE TRY AGAIN LATER.".format(login))
+        sys.exit(0)
+
     print("HELLO {}! YOU ARE NOW IN THE LOBBY. OTHER NERVOUS ENGINEERS THAT ARE AVOIDING EYE CONTACT ARE:".format(login))
     print()
     await list_users(session)
     print()
     print("PRESS THE [ENTER] (OR [RETURN]) KEY TO SIGNAL YOU ARE READY TO START.")
     while True:
+        status = await getIsGameStarted(session)
+        if(status == 200):
+            break
         input = input_async(REFRESH_INTERVAL, echo=False)
         if len(input) > 0 and input[-1]==CR:
             await postStopGame(session)
@@ -157,6 +165,10 @@ async def idle(session):
 
     await getTryGetResult(session)
 
+async def game_over(session):
+    await postStopGame(session)
+    sys.exit(0)
+
 async def game_screen(session):
     clear_screen()
     print("Press the Q key and then press ENTER (or RETURN) to quit.")
@@ -164,6 +176,9 @@ async def game_screen(session):
 
     WumpusGameEngine.displayRoomInfo()
     while True:
+        if(WumpusGameEngine.GameOver):
+            await game_over(session)
+        
         cmd = await get_cmd(session)
         print()
         
@@ -196,7 +211,7 @@ async def convert_cmd_to_request(command, session):
             error = True
     else:
         if (command == "QUIT" or command == "Q"):
-            sys.exit(0)
+            await game_over(session)
         elif (command == "HELP" or command == "H"):
             WumpusGameEngine.show_instructions()
         else:
@@ -236,6 +251,13 @@ async def postExitGame(session):
     fullurl = 'https://{}:{}/api/{}/?user={}'.format(GAMEHOST,PORT,'ExitGame',login)
     async with session.post(fullurl) as response:
         return await response.text()
+
+async def getIsGameStarted(session):
+    # IsGameStarted API call
+    fullurl = 'https://{}:{}/api/{}'.format(GAMEHOST,PORT,'IsGameStarted')
+    async with session.get(fullurl) as response:
+        await response.text()
+        return response.status
 
 async def getListUsers(session):
     # ListUsers API call
