@@ -15,27 +15,29 @@ namespace VotePolling
 {
     public static class Function1
     {
-        [FunctionName("VotePolling")]
+        [FunctionName("InsertVote")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
-
-            string name = req.Query["name"];
+            log.LogInformation("C# HTTP trigger function processed a request.");            
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var data = JsonConvert.DeserializeObject<WumpusActionVote>(requestBody);
-            // name = name ?? data?.name;
+            var data = JsonConvert.DeserializeObject<WumpusActionVote>(requestBody);            
 
-            var sDSWumpusData = new SDSWumpusData();
-            var voteData = (WumpusActionVote)data;
-            await sDSWumpusData.InsertWumpusValue(voteData);
-
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
+            var sDSWumpusData = new SDSWumpusData();            
+            await sDSWumpusData.GetOrCreateWumpusType();
+            await sDSWumpusData.GetOrCreateWumpusStream();
+            try
+            {
+                await sDSWumpusData.InsertWumpusValue(data);
+            }
+            catch(Exception ex)
+            {
+                log.LogError("There was an error in inserting the value", ex);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+            
             return new OkObjectResult(true);
         }
     }
