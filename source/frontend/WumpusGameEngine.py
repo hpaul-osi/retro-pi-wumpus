@@ -262,11 +262,11 @@ def displayRoomInfo():
         if Bats1.location.number == room or Bats2.location.number == room:
             print("Bats nearby!")
 
-def sendVote(command, moveCount):
+""" def sendVote(command, moveCount):
     return True
 
 def getPollingResults(moveCount):
-    return True
+    return True """
 
 def polling():
     while True:
