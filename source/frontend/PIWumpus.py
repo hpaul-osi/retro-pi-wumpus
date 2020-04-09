@@ -1,10 +1,11 @@
 import aiohttp
 import asyncio
+import ctypes
+import datetime
 import kbhit
 import os
 import sys
 import time
-import ctypes
 import WumpusGameEngine
 
 # Constants
@@ -144,7 +145,7 @@ async def idle(session):
     global last_chat_time
 
     chats = []
-    current_time = time.localtime
+    current_time = datetime.datetime.utcnow().isoformat()
     if last_chat_time != "":
         chats = await getRecentChats(session, last_chat_time)
     last_chat_time = current_time
@@ -156,7 +157,7 @@ async def idle(session):
 
 async def game_screen(session):
     clear_screen()
-    print("Hold down CTRL and press C (and ignore the call stack) to quit ...")
+    print("Press the Q key and then press ENTER (or RETURN) to quit.")
     print()
 
     WumpusGameEngine.displayRoomInfo()
@@ -164,7 +165,9 @@ async def game_screen(session):
         cmd = await get_cmd(session)
         print()
         
-        await convert_cmd_to_request(cmd, session)
+        # echo this back for now so that something shows up
+        if await convert_cmd_to_request(cmd, session) == True:
+            add_chat(cmd)
 
 def isInteger(value):
     try:
@@ -202,7 +205,8 @@ async def convert_cmd_to_request(command, session):
     if error==True:
         print_part(" **WHAT??")
     else:
-        erase_line(INPUT_LINE + 1)  
+        erase_line(INPUT_LINE + 1)
+    return error == False 
 
 async def postInsertVote(session, data):
     # InsertVote API call
@@ -243,7 +247,10 @@ async def getTryGetResult(session):
 
 # TODO: everything
 async def getRecentChats(session, last_chat_time):
-    return [ "Jeremy, does this annoy you?"]
+    return []
+    fullurl = 'https://{}:{}/api/{}?timestamp={},movenumber={}'.format(GAMEHOST,PORT,'VotesAfterTime',last_chat_time, WumpusGameEngine.moveCount) 
+    async with session.get(fullurl) as response:
+        return await response.text()
 
 async def main():
     global login
